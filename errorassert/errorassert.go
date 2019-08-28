@@ -3,7 +3,7 @@ package errorassert
 import (
 	"testing"
 
-	"github.com/lifenod/go-assert/internal"
+	"github.com/lifenod/assert/internal"
 )
 
 func Equal(t *testing.T, actual, expected interface{}) {

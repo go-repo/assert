@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/lifenod/go-assert/diff/internal"
+	"github.com/lifenod/assert/diff/internal"
 )
 
 const indent = "    "

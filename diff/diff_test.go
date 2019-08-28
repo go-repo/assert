@@ -6,8 +6,8 @@ import (
 	"testing"
 	"unsafe"
 
-	"github.com/lifenod/go-assert/diff/internal"
-	"github.com/lifenod/go-assert/diff/test/draw_tree"
+	"github.com/lifenod/assert/diff/internal"
+	"github.com/lifenod/assert/diff/test/draw_tree"
 )
 
 type S1 struct {

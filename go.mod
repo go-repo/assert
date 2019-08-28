@@ -1,3 +1,3 @@
-module github.com/lifenod/go-assert
+module github.com/lifenod/assert
 
 go 1.12

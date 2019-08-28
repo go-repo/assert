@@ -16,10 +16,10 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v1
       with:
-        path: ./go/src/github.com/lifenod/go-assert
+        path: ./go/src/github.com/lifenod/assert
 
     - name: Link go path
-      run: ln -s /home/runner/work/go-assert/go /home/runner/go
+      run: ln -s /home/runner/work/assert/go /home/runner/go
 
     - name: Go mod download
       run: go mod download
