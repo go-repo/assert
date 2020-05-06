@@ -26,32 +26,44 @@ var tests = []struct {
 	expectedIsExitError bool
 }{
 	{
-		fn: testEqualIsNotEqual,
-		expectedOutput: `        assert_test.go:%v: actual and expected are not equal
+		fn:                  testEqual__IsEqual,
+		expectedOutput:      "",
+		expectedIsExitError: false,
+	},
+
+	{
+		fn: testEqual__IsNotEqual,
+		expectedOutput: `        assert_test.go:%v: actual (-) and expected (+) are not equal
             - int(1)
             + int(2)`,
 		expectedIsExitError: true,
 	},
 
 	{
-		fn:                  testEqualIsEqual,
-		expectedOutput:      "",
-		expectedIsExitError: false,
+		fn: testEqual__IsNotEqual__SlicesWithDifferentLength,
+		expectedOutput: `        assert_test.go:%v: actual (-) and expected (+) are not equal
+              []int{
+            -     1: int(2)
+            -     2: int(3)
+              }`,
+		expectedIsExitError: true,
 	},
 
 	{
-		fn:                  testErrorEqualIsEqual,
-		expectedOutput:      "",
-		expectedIsExitError: false,
+		fn: testEqual__IsNotEqual__NilAndEmptySlice,
+		expectedOutput: `        assert_test.go:%v: actual (-) and expected (+) are not equal
+            - []uint8(nil)
+            + []uint8([])`,
+		expectedIsExitError: true,
 	},
 
 	{
-		fn: testErrorEqualIsNotEqual,
-		expectedOutput: `        assert_test.go:%v: actual and expected are not equal
+		fn: testErrorEqual__IsNotEqual,
+		expectedOutput: `        assert_test.go:%v: actual (-) and expected (+) are not equal
             - string("123")
             + string("456")
             
-        assert_test.go:%v: actual and expected are not equal
+        assert_test.go:%v: actual (-) and expected (+) are not equal
             - string("78")
             + string("90")`,
 		expectedIsExitError: true,
@@ -68,28 +80,33 @@ func funcName(fn interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 }
 
-func testEqualIsNotEqual(t *testing.T) {
-	_, _, line, _ := runtime.Caller(0)
-	fmt.Println(line + 2)
-	assert.Equal(t, 1, 2)
-	assert.Equal(t, 2, 5)
-}
-
-func testEqualIsEqual(t *testing.T) {
+func testEqual__IsEqual(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Println(line + 2)
 	assert.Equal(t, 5, 5)
 	assert.Equal(t, 6, 6)
 }
 
-func testErrorEqualIsEqual(t *testing.T) {
+func testEqual__IsNotEqual(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
-	fmt.Printf("%v:%v\n", line+2, line+3)
-	errorassert.Equal(t, "1", "1")
-	errorassert.Equal(t, "100", "100")
+	fmt.Println(line + 2)
+	assert.Equal(t, 1, 2)
+	assert.Equal(t, 2, 5)
 }
 
-func testErrorEqualIsNotEqual(t *testing.T) {
+func testEqual__IsNotEqual__SlicesWithDifferentLength(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 2)
+	assert.Equal(t, []int{1, 2, 3}, []int{1})
+}
+
+func testEqual__IsNotEqual__NilAndEmptySlice(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 2)
+	assert.Equal(t, []byte(nil), []byte{})
+}
+
+func testErrorEqual__IsNotEqual(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Printf("%v:%v\n", line+2, line+3)
 	errorassert.Equal(t, "123", "456")
@@ -155,7 +172,7 @@ func TestAll(t *testing.T) {
 		}
 		expected := fmt.Sprintf(test.expectedOutput, argsI...)
 		if !strings.Contains(output, expected) {
-			t.Fatalf("%v > expectedOutput is unexpected", funcName(test.fn))
+			t.Fatalf("%v > expectedOutput is unexpected, actual output is \n```\n%v\n```\n", funcName(test.fn), output)
 		}
 	}
 }

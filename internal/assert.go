@@ -14,6 +14,6 @@ func Equal(t *testing.T, actual, expected interface{}) bool {
 		return true
 	}
 
-	t.Log("actual and expected are not equal\n" + diff.Diff(actual, expected))
+	t.Log("actual (-) and expected (+) are not equal\n" + diff.Diff(actual, expected))
 	return false
 }

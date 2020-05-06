@@ -353,31 +353,31 @@ func TestDiff__NilValues(t *testing.T) {
 	}
 
 	expectedDiff := fmt.Sprintf(`  &diff.S3{
--     pppBool: ***bool(<nil>)
+-     pppBool: ***bool(nil)
 +     pppBool: ***bool(%v)
--     pInt: *int(<nil>)
+-     pInt: *int(nil)
 +     pInt: *int(%v)
--     pUint64: *uint64(<nil>)
+-     pUint64: *uint64(nil)
 +     pUint64: *uint64(%v)
--     pMapping: *map[diff.S4]*diff.S4(<nil>)
+-     pMapping: *map[diff.S4]*diff.S4(nil)
 +     pMapping: *map[diff.S4]*diff.S4(&map[{3}:<nil>])
--     pArray: *[2]float32(<nil>)
+-     pArray: *[2]float32(nil)
 +     pArray: *[2]float32(&[4 0])
--     pSlice: *[]string(<nil>)
+-     pSlice: *[]string(nil)
 +     pSlice: *[]string(&[5])
--     pStru: *diff.S4(<nil>)
+-     pStru: *diff.S4(nil)
 +     pStru: *diff.S4(&{6})
--     ch: chan int(<nil>)
+-     ch: chan int(nil)
 +     ch: chan int(%v)
--     fn: func()(<nil>)
+-     fn: func()(nil)
 +     fn: func()(%v)
--     mapping: map[string]bool(map[])
+-     mapping: map[string]bool(nil)
 +     mapping: map[string]bool(map[7:true])
--     unsafePointer: unsafe.Pointer(<nil>)
+-     unsafePointer: unsafe.Pointer(nil)
 +     unsafePointer: unsafe.Pointer(%v)
--     inter: interface {}(interface {}(nil))
+-     inter: interface {}(nil)
 +     inter: interface {}(diff.S4{int:8})
--     slice: []diff.S4([])
+-     slice: []diff.S4(nil)
 +     slice: []diff.S4([{9}])
   }
 `, &yPtrPtrBool, &yInt, &yUint64,
@@ -409,7 +409,7 @@ func TestDiff__MultilevelPointers(t *testing.T) {
 	**pppy = emptyPP
 
 	diff = Diff(pppx, pppy)
-	if diff != fmt.Sprintf("- **(*int)(%v)\n+ **(*int)(<nil>)\n",
+	if diff != fmt.Sprintf("- **(*int)(%v)\n+ **(*int)(nil)\n",
 		unsafe.Pointer(&x)) {
 		t.Fatal()
 	}

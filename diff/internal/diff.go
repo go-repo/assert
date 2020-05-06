@@ -7,6 +7,18 @@ import (
 	"unsafe"
 )
 
+var (
+	canCallIsNilFuncKindMap = map[reflect.Kind]bool{
+		reflect.Chan:          true,
+		reflect.Func:          true,
+		reflect.Map:           true,
+		reflect.Ptr:           true,
+		reflect.UnsafePointer: true,
+		reflect.Interface:     true,
+		reflect.Slice:         true,
+	}
+)
+
 func createNewCurrentNode(current *Node, v reflect.Value, key string) *Node {
 	child := &Node{
 		Key:  key,
@@ -18,6 +30,12 @@ func createNewCurrentNode(current *Node, v reflect.Value, key string) *Node {
 }
 
 func diffXYVal(v reflect.Value) string {
+	if canCallIsNilFuncKindMap[v.Kind()] {
+		if v.IsNil() {
+			return "nil"
+		}
+	}
+
 	if v.Kind() == reflect.String ||
 		v.Kind() == reflect.Interface {
 		return fmt.Sprintf("%#v", v)
@@ -219,6 +237,29 @@ func isReferenceCycle(v1, v2 reflect.Value, visited map[visit]bool) bool {
 	return false
 }
 
+func deepDiffSlice(curr *Node, x, y reflect.Value, visited map[visit]bool) {
+	if x.Len() >= y.Len() {
+		var i int
+		for ; i < y.Len(); i++ {
+			deepDiff(curr, x.Index(i), y.Index(i), strconv.Itoa(i), visited)
+		}
+
+		for ; i < x.Len(); i++ {
+			createChildNodeForX(curr, x.Index(i), strconv.Itoa(i))
+		}
+	} else {
+		var i int
+		for ; i < x.Len(); i++ {
+			deepDiff(curr, x.Index(i), y.Index(i), strconv.Itoa(i), visited)
+		}
+
+		for ; i < y.Len(); i++ {
+			createChildNodeForY(curr, y.Index(i), strconv.Itoa(i))
+		}
+	}
+
+}
+
 func deepDiff(curr *Node, x, y reflect.Value, key string, visited map[visit]bool) {
 	if diffIsValid(curr, x, y, key) {
 		return
@@ -275,9 +316,7 @@ func deepDiff(curr *Node, x, y reflect.Value, key string, visited map[visit]bool
 			return
 		}
 		newNode := createNewCurrentNode(curr, x, key)
-		for i := 0; i < x.Len(); i++ {
-			deepDiff(newNode, x.Index(i), y.Index(i), strconv.Itoa(i), visited)
-		}
+		deepDiffSlice(newNode, x, y, visited)
 	case reflect.String:
 		ifFalseThenCreateChildNodes(x.String() == y.String(), curr, x, y, key)
 	case reflect.Struct:
