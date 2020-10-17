@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/lifenod/assert/diff"
+	"github.com/go-repo/assert/diff"
 )
 
 func Equal(t *testing.T, actual, expected interface{}) bool {

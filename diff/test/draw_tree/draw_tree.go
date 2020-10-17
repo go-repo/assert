@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lifenod/assert/diff/internal"
+	"github.com/go-repo/assert/diff/internal"
 )
 
 var nextNodeName = func() func() string {

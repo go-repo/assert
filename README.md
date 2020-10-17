@@ -6,7 +6,7 @@ package assert_test
 import (
 	"testing"
 
-	"github.com/lifenod/assert"
+	"github.com/go-repo/assert"
 )
 
 type StructA struct {
@@ -52,7 +52,7 @@ package errorassert_test
 import (
 	"testing"
 
-	"github.com/lifenod/assert/errorassert"
+	"github.com/go-repo/assert/errorassert"
 )
 
 type StructA struct {

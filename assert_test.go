@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lifenod/assert"
-	"github.com/lifenod/assert/errorassert"
+	"github.com/go-repo/assert"
+	"github.com/go-repo/assert/errorassert"
 )
 
 const TestRunNameEnvKey = "TEST_RUN_NAME"

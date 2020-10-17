@@ -16,7 +16,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v1
       with:
-        path: ./go/src/github.com/lifenod/assert
+        path: ./go/src/github.com/go-repo/assert
 
     - name: Link go path
       run: ln -s /home/runner/work/assert/go /home/runner/go
