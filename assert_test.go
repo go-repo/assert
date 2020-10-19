@@ -1,6 +1,7 @@
 package assert_test
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -68,6 +69,25 @@ var tests = []struct {
             + string("90")`,
 		expectedIsExitError: true,
 	},
+
+	{
+		fn:                  testNoError__IsError,
+		expectedOutput:      "assert_test.go:%v: error is not nil, actual is: error message",
+		expectedIsExitError: true,
+	},
+
+	{
+		fn:                  testNoError__IsNotError,
+		expectedOutput:      "",
+		expectedIsExitError: false,
+	},
+
+	{
+		fn: testErrorNoError__IsError,
+		expectedOutput: `        assert_test.go:%v: error is not nil, actual is: error message 1
+        assert_test.go:%v: error is not nil, actual is: error message 2`,
+		expectedIsExitError: true,
+	},
 }
 
 func init() {
@@ -111,6 +131,24 @@ func testErrorEqual__IsNotEqual(t *testing.T) {
 	fmt.Printf("%v:%v\n", line+2, line+3)
 	errorassert.Equal(t, "123", "456")
 	errorassert.Equal(t, "78", "90")
+}
+
+func testNoError__IsError(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 2)
+	assert.NoError(t, errors.New("error message"))
+}
+
+func testNoError__IsNotError(t *testing.T) {
+	var err error
+	assert.NoError(t, err)
+}
+
+func testErrorNoError__IsError(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Printf("%v:%v\n", line+2, line+3)
+	errorassert.NoError(t, errors.New("error message 1"))
+	errorassert.NoError(t, errors.New("error message 2"))
 }
 
 // Used to run a test via shell command.

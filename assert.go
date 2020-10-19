@@ -13,3 +13,11 @@ func Equal(t *testing.T, actual, expected interface{}) {
 		t.FailNow()
 	}
 }
+
+func NoError(t *testing.T, err error) {
+	t.Helper()
+
+	if !internal.NoError(t, err) {
+		t.FailNow()
+	}
+}
