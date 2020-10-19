@@ -14,7 +14,7 @@ func Equal(t *testing.T, actual, expected interface{}) bool {
 		return true
 	}
 
-	t.Log("actual (-) and expected (+) are not equal\n" + diff.Diff(actual, expected))
+	t.Log("Actual (-) and expected (+) are not equal:\n" + diff.Diff(actual, expected))
 	return false
 }
 
@@ -45,6 +45,6 @@ func NoError(t *testing.T, err error) bool {
 		return true
 	}
 
-	t.Logf("error is not nil, actual is: %v\n", err)
+	t.Logf("Got unexpected error: %v\n", err)
 	return false
 }

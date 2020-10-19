@@ -32,7 +32,7 @@ Run the test and output:
 
 ```
 === RUN   TestEqual
-    TestEqual: main_test.go:15: actual (-) and expected (+) are not equal
+    main_test.go:15: Actual (-) and expected (+) are not equal:
           &assert_test.StructA{
         -     A: int64(1)
         +     A: int64(2)
@@ -98,12 +98,12 @@ Run the test and output:
 === RUN   TestEqual
 === RUN   TestEqual/equal
 === RUN   TestEqual/not_equal_for_int_type
-    TestEqual/not_equal_for_int_type: main_test.go:40: actual (-) and expected (+) are not equal
+    main_test.go:40: Actual (-) and expected (+) are not equal:
         - int(1)
         + int(2)
 
 === RUN   TestEqual/not_equal_for_struct_type
-    TestEqual/not_equal_for_struct_type: main_test.go:40: actual (-) and expected (+) are not equal
+    main_test.go:40: Actual (-) and expected (+) are not equal:
           errorassert_test.StructA{
         -     B: string("abc")
         +     B: string("def")

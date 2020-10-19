@@ -34,7 +34,7 @@ var tests = []struct {
 
 	{
 		fn: testEqual__IsNotEqual,
-		expectedOutput: `        assert_test.go:%v: actual (-) and expected (+) are not equal
+		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - int(1)
             + int(2)`,
 		expectedIsExitError: true,
@@ -42,7 +42,7 @@ var tests = []struct {
 
 	{
 		fn: testEqual__IsNotEqual__SlicesWithDifferentLength,
-		expectedOutput: `        assert_test.go:%v: actual (-) and expected (+) are not equal
+		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
               []int{
             -     1: int(2)
             -     2: int(3)
@@ -52,7 +52,7 @@ var tests = []struct {
 
 	{
 		fn: testEqual__IsNotEqual__NilAndEmptySlice,
-		expectedOutput: `        assert_test.go:%v: actual (-) and expected (+) are not equal
+		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - []uint8(nil)
             + []uint8([])`,
 		expectedIsExitError: true,
@@ -60,11 +60,11 @@ var tests = []struct {
 
 	{
 		fn: testErrorEqual__IsNotEqual,
-		expectedOutput: `        assert_test.go:%v: actual (-) and expected (+) are not equal
+		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - string("123")
             + string("456")
             
-        assert_test.go:%v: actual (-) and expected (+) are not equal
+        assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - string("78")
             + string("90")`,
 		expectedIsExitError: true,
@@ -72,7 +72,7 @@ var tests = []struct {
 
 	{
 		fn:                  testNoError__IsError,
-		expectedOutput:      "assert_test.go:%v: error is not nil, actual is: error message",
+		expectedOutput:      "assert_test.go:%v: Got unexpected error: error message",
 		expectedIsExitError: true,
 	},
 
@@ -84,8 +84,8 @@ var tests = []struct {
 
 	{
 		fn: testErrorNoError__IsError,
-		expectedOutput: `        assert_test.go:%v: error is not nil, actual is: error message 1
-        assert_test.go:%v: error is not nil, actual is: error message 2`,
+		expectedOutput: `        assert_test.go:%v: Got unexpected error: error message 1
+        assert_test.go:%v: Got unexpected error: error message 2`,
 		expectedIsExitError: true,
 	},
 }
