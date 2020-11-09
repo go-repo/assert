@@ -14,6 +14,14 @@ func Equal(t *testing.T, actual, expected interface{}) {
 	}
 }
 
+func NotEqual(t *testing.T, actual, expected interface{}) {
+	t.Helper()
+
+	if !internal.NotEqual(t, actual, expected) {
+		t.Fail()
+	}
+}
+
 func NoError(t *testing.T, err error) {
 	t.Helper()
 

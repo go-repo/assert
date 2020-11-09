@@ -18,6 +18,17 @@ func Equal(t *testing.T, actual, expected interface{}) bool {
 	return false
 }
 
+func NotEqual(t *testing.T, actual, expected interface{}) bool {
+	t.Helper()
+
+	if !reflect.DeepEqual(actual, expected) {
+		return true
+	}
+
+	t.Logf("Actual and expected are equal: %#v\n", actual)
+	return false
+}
+
 func isNil(i interface{}) bool {
 	if i == nil {
 		return true

@@ -59,7 +59,7 @@ var tests = []struct {
 	},
 
 	{
-		fn: testErrorEqual__IsNotEqual,
+		fn: testErrorAssert__Equal__IsNotEqual,
 		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - string("123")
             + string("456")
@@ -67,6 +67,25 @@ var tests = []struct {
         assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - string("78")
             + string("90")`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn:                  testNotEqual__True,
+		expectedOutput:      "",
+		expectedIsExitError: false,
+	},
+
+	{
+		fn:                  testNotEqual__False,
+		expectedOutput:      `        assert_test.go:%v: Actual and expected are equal: []string{"1"}`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn: testErrorAssert__NotEqual__False,
+		expectedOutput: `        assert_test.go:%v: Actual and expected are equal: []struct {}{}
+        assert_test.go:%v: Actual and expected are equal: &errors.errorString{s:"err"}`,
 		expectedIsExitError: true,
 	},
 
@@ -83,7 +102,7 @@ var tests = []struct {
 	},
 
 	{
-		fn: testErrorNoError__IsError,
+		fn: testErrorAssert__NoError__IsError,
 		expectedOutput: `        assert_test.go:%v: Got unexpected error: error message 1
         assert_test.go:%v: Got unexpected error: error message 2`,
 		expectedIsExitError: true,
@@ -126,11 +145,30 @@ func testEqual__IsNotEqual__NilAndEmptySlice(t *testing.T) {
 	assert.Equal(t, []byte(nil), []byte{})
 }
 
-func testErrorEqual__IsNotEqual(t *testing.T) {
+func testErrorAssert__Equal__IsNotEqual(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Printf("%v:%v\n", line+2, line+3)
 	errorassert.Equal(t, "123", "456")
 	errorassert.Equal(t, "78", "90")
+}
+
+func testNotEqual__True(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 2)
+	assert.NotEqual(t, 0, 1)
+}
+
+func testNotEqual__False(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 2)
+	assert.NotEqual(t, []string{"1"}, []string{"1"})
+}
+
+func testErrorAssert__NotEqual__False(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Printf("%v:%v\n", line+2, line+3)
+	errorassert.NotEqual(t, []struct{}{}, []struct{}{})
+	errorassert.NotEqual(t, errors.New("err"), errors.New("err"))
 }
 
 func testNoError__IsError(t *testing.T) {
@@ -144,7 +182,7 @@ func testNoError__IsNotError(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func testErrorNoError__IsError(t *testing.T) {
+func testErrorAssert__NoError__IsError(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Printf("%v:%v\n", line+2, line+3)
 	errorassert.NoError(t, errors.New("error message 1"))
@@ -188,6 +226,7 @@ func execTest(fn func(t *testing.T)) (_ string, isExitError bool, _ error) {
 func TestAll(t *testing.T) {
 	for _, test := range tests {
 		fnName := funcName(test.fn)
+		t.Logf("Run test %v\n", fnName)
 
 		output, isExitError, err := execTest(test.fn)
 		if err != nil {
