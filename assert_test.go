@@ -20,6 +20,10 @@ var (
 	testRunNameMapping = map[string]func(*testing.T){}
 )
 
+type testStruct struct {
+	Field1 string
+}
+
 var tests = []struct {
 	fn func(*testing.T)
 
@@ -107,6 +111,44 @@ var tests = []struct {
         assert_test.go:%v: Got unexpected error: error message 2`,
 		expectedIsExitError: true,
 	},
+
+	{
+		fn:                  testNil_Expected,
+		expectedOutput:      "",
+		expectedIsExitError: false,
+	},
+
+	{
+		fn:                  testNil_Unexpected,
+		expectedOutput:      `        assert_test.go:%v: Expected nil but got: &assert_test.testStruct{Field1:""}`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn: testErrorAssert_Nil_Unexpected,
+		expectedOutput: `        assert_test.go:%v: Expected nil but got: 1
+        assert_test.go:%v: Expected nil but got: []int{}`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn:                  testNotNil_Expected,
+		expectedOutput:      "",
+		expectedIsExitError: false,
+	},
+
+	{
+		fn:                  testNotNil_Unexpected,
+		expectedOutput:      `        assert_test.go:%v: Expected not nil but got nil: <nil>`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn: testErrorAssert_NotNil_Unexpected,
+		expectedOutput: `        assert_test.go:%v: Expected not nil but got nil: <nil>
+        assert_test.go:%v: Expected not nil but got nil: (*assert_test.testStruct)(nil)`,
+		expectedIsExitError: true,
+	},
 }
 
 func init() {
@@ -187,6 +229,47 @@ func testErrorAssert__NoError__IsError(t *testing.T) {
 	fmt.Printf("%v:%v\n", line+2, line+3)
 	errorassert.NoError(t, errors.New("error message 1"))
 	errorassert.NoError(t, errors.New("error message 2"))
+}
+
+func testNil_Expected(t *testing.T) {
+	assert.Nil(t, nil)
+	assert.Nil(t, (*struct{})(nil))
+
+	var ts *testStruct
+	assert.Nil(t, ts)
+}
+
+func testNil_Unexpected(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 2)
+	assert.Nil(t, &testStruct{})
+}
+
+func testErrorAssert_Nil_Unexpected(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Printf("%v:%v\n", line+2, line+3)
+	errorassert.Nil(t, 1)
+	errorassert.Nil(t, []int{})
+}
+
+func testNotNil_Expected(t *testing.T) {
+	assert.NotNil(t, 100)
+	assert.NotNil(t, &testStruct{})
+}
+
+func testNotNil_Unexpected(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 3)
+	var err error
+	assert.NotNil(t, err)
+}
+
+func testErrorAssert_NotNil_Unexpected(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Printf("%v:%v\n", line+2, line+4)
+	errorassert.NotNil(t, nil)
+	var ts *testStruct
+	errorassert.NotNil(t, ts)
 }
 
 // Used to run a test via shell command.

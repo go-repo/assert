@@ -29,3 +29,19 @@ func NoError(t *testing.T, err error) {
 		t.FailNow()
 	}
 }
+
+func Nil(t *testing.T, actual interface{}) {
+	t.Helper()
+
+	if !internal.Nil(t, actual) {
+		t.FailNow()
+	}
+}
+
+func NotNil(t *testing.T, actual interface{}) {
+	t.Helper()
+
+	if !internal.NotNil(t, actual) {
+		t.FailNow()
+	}
+}
