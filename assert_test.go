@@ -20,6 +20,10 @@ var (
 	testRunNameMapping = map[string]func(*testing.T){}
 )
 
+type testStruct struct {
+	Field1 string
+}
+
 var tests = []struct {
 	fn func(*testing.T)
 
@@ -27,13 +31,13 @@ var tests = []struct {
 	expectedIsExitError bool
 }{
 	{
-		fn:                  testEqual__IsEqual,
+		fn:                  testEqual_Expected,
 		expectedOutput:      "",
 		expectedIsExitError: false,
 	},
 
 	{
-		fn: testEqual__IsNotEqual,
+		fn: testEqual_Unexpected,
 		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - int(1)
             + int(2)`,
@@ -41,7 +45,7 @@ var tests = []struct {
 	},
 
 	{
-		fn: testEqual__IsNotEqual__SlicesWithDifferentLength,
+		fn: testEqual_Unexpected_SlicesWithDifferentLength,
 		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
               []int{
             -     1: int(2)
@@ -51,7 +55,7 @@ var tests = []struct {
 	},
 
 	{
-		fn: testEqual__IsNotEqual__NilAndEmptySlice,
+		fn: testEqual_Unexpected_NilAndEmptySlice,
 		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - []uint8(nil)
             + []uint8([])`,
@@ -59,7 +63,7 @@ var tests = []struct {
 	},
 
 	{
-		fn: testErrorAssert__Equal__IsNotEqual,
+		fn: testErrorAssert_Equal_Unexpected,
 		expectedOutput: `        assert_test.go:%v: Actual (-) and expected (+) are not equal:
             - string("123")
             + string("456")
@@ -71,40 +75,78 @@ var tests = []struct {
 	},
 
 	{
-		fn:                  testNotEqual__True,
+		fn:                  testNotEqual_Expected,
 		expectedOutput:      "",
 		expectedIsExitError: false,
 	},
 
 	{
-		fn:                  testNotEqual__False,
+		fn:                  testNotEqual_Unexpected,
 		expectedOutput:      `        assert_test.go:%v: Actual and expected are equal: []string{"1"}`,
 		expectedIsExitError: true,
 	},
 
 	{
-		fn: testErrorAssert__NotEqual__False,
+		fn: testErrorAssert_NotEqual_Unexpected,
 		expectedOutput: `        assert_test.go:%v: Actual and expected are equal: []struct {}{}
         assert_test.go:%v: Actual and expected are equal: &errors.errorString{s:"err"}`,
 		expectedIsExitError: true,
 	},
 
 	{
-		fn:                  testNoError__IsError,
+		fn:                  testNoError_Unexpected,
 		expectedOutput:      "assert_test.go:%v: Got unexpected error: error message",
 		expectedIsExitError: true,
 	},
 
 	{
-		fn:                  testNoError__IsNotError,
+		fn:                  testNoError_Expected,
 		expectedOutput:      "",
 		expectedIsExitError: false,
 	},
 
 	{
-		fn: testErrorAssert__NoError__IsError,
+		fn: testErrorAssert_NoError_Unexpected,
 		expectedOutput: `        assert_test.go:%v: Got unexpected error: error message 1
         assert_test.go:%v: Got unexpected error: error message 2`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn:                  testNil_Expected,
+		expectedOutput:      "",
+		expectedIsExitError: false,
+	},
+
+	{
+		fn:                  testNil_Unexpected,
+		expectedOutput:      `        assert_test.go:%v: Expected nil but got: &assert_test.testStruct{Field1:""}`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn: testErrorAssert_Nil_Unexpected,
+		expectedOutput: `        assert_test.go:%v: Expected nil but got: 1
+        assert_test.go:%v: Expected nil but got: []int{}`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn:                  testNotNil_Expected,
+		expectedOutput:      "",
+		expectedIsExitError: false,
+	},
+
+	{
+		fn:                  testNotNil_Unexpected,
+		expectedOutput:      `        assert_test.go:%v: Expected not nil but got nil: <nil>`,
+		expectedIsExitError: true,
+	},
+
+	{
+		fn: testErrorAssert_NotNil_Unexpected,
+		expectedOutput: `        assert_test.go:%v: Expected not nil but got nil: <nil>
+        assert_test.go:%v: Expected not nil but got nil: (*assert_test.testStruct)(nil)`,
 		expectedIsExitError: true,
 	},
 }
@@ -119,74 +161,115 @@ func funcName(fn interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 }
 
-func testEqual__IsEqual(t *testing.T) {
+func testEqual_Expected(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Println(line + 2)
 	assert.Equal(t, 5, 5)
 	assert.Equal(t, 6, 6)
 }
 
-func testEqual__IsNotEqual(t *testing.T) {
+func testEqual_Unexpected(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Println(line + 2)
 	assert.Equal(t, 1, 2)
 	assert.Equal(t, 2, 5)
 }
 
-func testEqual__IsNotEqual__SlicesWithDifferentLength(t *testing.T) {
+func testEqual_Unexpected_SlicesWithDifferentLength(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Println(line + 2)
 	assert.Equal(t, []int{1, 2, 3}, []int{1})
 }
 
-func testEqual__IsNotEqual__NilAndEmptySlice(t *testing.T) {
+func testEqual_Unexpected_NilAndEmptySlice(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Println(line + 2)
 	assert.Equal(t, []byte(nil), []byte{})
 }
 
-func testErrorAssert__Equal__IsNotEqual(t *testing.T) {
+func testErrorAssert_Equal_Unexpected(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Printf("%v:%v\n", line+2, line+3)
 	errorassert.Equal(t, "123", "456")
 	errorassert.Equal(t, "78", "90")
 }
 
-func testNotEqual__True(t *testing.T) {
+func testNotEqual_Expected(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Println(line + 2)
 	assert.NotEqual(t, 0, 1)
 }
 
-func testNotEqual__False(t *testing.T) {
+func testNotEqual_Unexpected(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Println(line + 2)
 	assert.NotEqual(t, []string{"1"}, []string{"1"})
 }
 
-func testErrorAssert__NotEqual__False(t *testing.T) {
+func testErrorAssert_NotEqual_Unexpected(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Printf("%v:%v\n", line+2, line+3)
 	errorassert.NotEqual(t, []struct{}{}, []struct{}{})
 	errorassert.NotEqual(t, errors.New("err"), errors.New("err"))
 }
 
-func testNoError__IsError(t *testing.T) {
+func testNoError_Unexpected(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Println(line + 2)
 	assert.NoError(t, errors.New("error message"))
 }
 
-func testNoError__IsNotError(t *testing.T) {
+func testNoError_Expected(t *testing.T) {
 	var err error
 	assert.NoError(t, err)
 }
 
-func testErrorAssert__NoError__IsError(t *testing.T) {
+func testErrorAssert_NoError_Unexpected(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	fmt.Printf("%v:%v\n", line+2, line+3)
 	errorassert.NoError(t, errors.New("error message 1"))
 	errorassert.NoError(t, errors.New("error message 2"))
+}
+
+func testNil_Expected(t *testing.T) {
+	assert.Nil(t, nil)
+	assert.Nil(t, (*struct{})(nil))
+
+	var ts *testStruct
+	assert.Nil(t, ts)
+}
+
+func testNil_Unexpected(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 2)
+	assert.Nil(t, &testStruct{})
+}
+
+func testErrorAssert_Nil_Unexpected(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Printf("%v:%v\n", line+2, line+3)
+	errorassert.Nil(t, 1)
+	errorassert.Nil(t, []int{})
+}
+
+func testNotNil_Expected(t *testing.T) {
+	assert.NotNil(t, 100)
+	assert.NotNil(t, &testStruct{})
+}
+
+func testNotNil_Unexpected(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Println(line + 3)
+	var err error
+	assert.NotNil(t, err)
+}
+
+func testErrorAssert_NotNil_Unexpected(t *testing.T) {
+	_, _, line, _ := runtime.Caller(0)
+	fmt.Printf("%v:%v\n", line+2, line+4)
+	errorassert.NotNil(t, nil)
+	var ts *testStruct
+	errorassert.NotNil(t, ts)
 }
 
 // Used to run a test via shell command.

@@ -59,3 +59,25 @@ func NoError(t *testing.T, err error) bool {
 	t.Logf("Got unexpected error: %v\n", err)
 	return false
 }
+
+func Nil(t *testing.T, actual interface{}) bool {
+	t.Helper()
+
+	if isNil(actual) {
+		return true
+	}
+
+	t.Logf("Expected nil but got: %#v\n", actual)
+	return false
+}
+
+func NotNil(t *testing.T, actual interface{}) bool {
+	t.Helper()
+
+	if !isNil(actual) {
+		return true
+	}
+
+	t.Logf("Expected not nil but got nil: %#v\n", actual)
+	return false
+}
